@@ -77,6 +77,17 @@ def fetch_quote(symbol: str, target_currency: str = "EUR") -> dict | None:
         if price is None:
             return None
 
+        # LSE quotano spesso in pence (GBp/GBX): yfinance restituisce un numero
+        # 100x troppo grande. Normalizziamo in GBP.
+        if native_ccy in ("GBX", "GBP.", "PENCE", "GBP_PENCE") or native_ccy == "GBP" and price > 1000 and symbol.endswith(".L"):
+            # Euristica: se native_ccy è già "GBP" ma il prezzo è >1000 su un .L
+            # è quasi certamente un ETC/ETF quotato in pence
+            price = float(price) / 100.0
+            if open_price: open_price = float(open_price) / 100.0
+            if prev_close: prev_close = float(prev_close) / 100.0
+            native_ccy = "GBP"
+            print(f"[INFO] {symbol}: detected GBX pricing, normalized to GBP")
+
         # Δ% intraday calcolato in valuta nativa (invariante al cambio FX intraday)
         ref = open_price or prev_close
         pct = ((float(price) - float(ref)) / float(ref) * 100.0) if ref else None
