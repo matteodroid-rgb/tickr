@@ -1,0 +1,39 @@
+name: tick poller
+
+on:
+  schedule:
+    # ogni 5 minuti, lun-ven (UTC). Il filtro orari di mercato avviene nel Python.
+    - cron: "*/5 * * * 1-5"
+  workflow_dispatch:
+    inputs:
+      skip_market_check:
+        description: "Forza il run anche fuori orario di mercato"
+        type: boolean
+        default: false
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency:
+      group: tick-poller
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run poller
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SKIP_MARKET_CHECK: ${{ inputs.skip_market_check && '1' || '' }}
+        run: python -m poller.main
