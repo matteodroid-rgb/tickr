@@ -1,0 +1,169 @@
+# ============================================================
+# Paniere di monitoraggio — alert intraday e SL/TP
+# ============================================================
+#
+# Tutti gli `entry_price` sono in EUR (come visualizzati su Trade Republic).
+# Il poller converte automaticamente i prezzi yfinance da valuta nativa
+# (USD/GBP/AUD/KRW) in EUR usando il cambio di yfinance, così SL/TP %
+# corrispondono a quelli che vedi sul tuo broker.
+#
+# Soglie per categoria:
+#   Mega cap          : SL -10% / TP +25%
+#   Mid cap semi      : SL -12% / TP +30%
+#   Spec volatile     : SL -20% / TP +50%
+#   ETF diversificato : SL  -8% / TP +20%
+#   ETF tematico      : SL -15% / TP +35%
+#   Asia primary      : SL -15% / TP +30%
+#
+# Soglie intraday: variano per asset (vedi commenti inline).
+# Cooldown 4h tra alert ripetuti sulla stessa condizione.
+
+defaults:
+  cooldown_hours: 4
+  intraday_threshold_pct: 3.0
+
+market_hours_utc:
+  - { name: "BIT", start: "06:30", end: "16:30", days: [0,1,2,3,4] }
+  - { name: "US",  start: "13:00", end: "21:00", days: [0,1,2,3,4] }
+
+tickers:
+  # ====== MEGA CAP ======
+  - symbol: LOTB.BR              # Lotus Bakeries — BE0003604155
+    name: "Lotus Bakeries"
+    entry_price: 7945.69
+    stop_loss_pct: -10
+    take_profit_pct: 25
+    intraday_threshold_pct: 3.0
+
+  - symbol: ASML.AS              # ASML Holding — NL0010273215
+    name: "ASML"
+    entry_price: 1012.63
+    stop_loss_pct: -10
+    take_profit_pct: 25
+    intraday_threshold_pct: 3.0
+
+  - symbol: GOOGL                # Alphabet Class A — US02079K3059
+    name: "Alphabet"
+    entry_price: 294.28
+    stop_loss_pct: -10
+    take_profit_pct: 25
+    intraday_threshold_pct: 3.0
+
+  - symbol: TSM                  # TSMC ADR — US8740391003
+    name: "TSMC"
+    entry_price: 279.05
+    stop_loss_pct: -10
+    take_profit_pct: 25
+    intraday_threshold_pct: 3.0
+
+  - symbol: AVGO                 # Broadcom — US11135F1012
+    name: "Broadcom"
+    entry_price: 305.87
+    stop_loss_pct: -10
+    take_profit_pct: 25
+    intraday_threshold_pct: 3.0
+
+  # ====== MID CAP SEMI ======
+  - symbol: MU                   # Micron Technology — US5951121038
+    name: "Micron"
+    entry_price: 545.74
+    stop_loss_pct: -12
+    take_profit_pct: 30
+    intraday_threshold_pct: 4.0
+
+  - symbol: AMAT                 # Applied Materials — US0382221051
+    name: "Applied Materials"
+    entry_price: 299.50
+    stop_loss_pct: -12
+    take_profit_pct: 30
+    intraday_threshold_pct: 3.5
+
+  - symbol: PWR                  # Quanta Services — US74762E1029
+    name: "Quanta Services"
+    entry_price: 666.89
+    stop_loss_pct: -12
+    take_profit_pct: 30
+    intraday_threshold_pct: 3.5
+
+  - symbol: BHP.AX               # BHP Group — AU000000BHP4 (ASX primary)
+    name: "BHP Group"
+    entry_price: 32.88
+    stop_loss_pct: -12
+    take_profit_pct: 30
+    intraday_threshold_pct: 4.0
+    # NB: ASX chiude alle 06:00 UTC. Alert intraday solo in mattinata IT.
+
+  # ====== SPEC AD ALTA VOLATILITÀ ======
+  - symbol: HIVE                 # HIVE Digital — CA4339211035
+    name: "HIVE Digital"
+    entry_price: 5.24
+    stop_loss_pct: -20
+    take_profit_pct: 50
+    intraday_threshold_pct: 7.0
+
+  - symbol: QBTS                 # D-Wave Quantum — US26740W1099
+    name: "D-Wave Quantum"
+    entry_price: 20.92
+    stop_loss_pct: -20
+    take_profit_pct: 50
+    intraday_threshold_pct: 7.0
+
+  - symbol: IONQ                 # IonQ — US46222L1089
+    name: "IonQ"
+    entry_price: 41.66
+    stop_loss_pct: -20
+    take_profit_pct: 50
+    intraday_threshold_pct: 7.0
+
+  # ====== ASIA PRIMARY ======
+  - symbol: 000660.KS            # SK Hynix — US78392B1070 (GDR) / 000660 KRX
+    name: "SK Hynix"
+    entry_price: 1010.84
+    stop_loss_pct: -15
+    take_profit_pct: 30
+    intraday_threshold_pct: 4.0
+    # NB: KRX chiude alle 06:30 UTC. Alert intraday in mattinata IT.
+
+  # ====== ETF DIVERSIFICATI ======
+  - symbol: VWCE.DE              # Vanguard FTSE All-World — IE00BK5BQT80
+    name: "Vanguard FTSE All-World"
+    entry_price: 153.86
+    stop_loss_pct: -8
+    take_profit_pct: 20
+    intraday_threshold_pct: 2.0
+
+  - symbol: AEEM.MI              # Amundi MSCI EM EUR Acc — LU1681045370
+    name: "Amundi MSCI EM"
+    entry_price: 7.04
+    stop_loss_pct: -8
+    take_profit_pct: 20
+    intraday_threshold_pct: 2.0
+
+  - symbol: SGLN.L               # iShares Physical Gold — IE00B4ND3602
+    name: "iShares Physical Gold"
+    entry_price: 77.61
+    stop_loss_pct: -8
+    take_profit_pct: 20
+    intraday_threshold_pct: 2.0
+
+  # ====== ETF TEMATICI ======
+  - symbol: VVSM.DE              # VanEck Semiconductor — IE00BMC38736
+    name: "VanEck Semiconductor"
+    entry_price: 71.91
+    stop_loss_pct: -15
+    take_profit_pct: 35
+    intraday_threshold_pct: 3.0
+
+  - symbol: D6AT.DE              # Global X Disruptive Materials — IE000FP52WM7
+    name: "Global X Disruptive Materials"
+    entry_price: 19.39
+    stop_loss_pct: -15
+    take_profit_pct: 35
+    intraday_threshold_pct: 3.0
+
+  - symbol: WQTM.L               # WisdomTree Quantum Computing — IE000W8WMSL2
+    name: "WT Quantum Computing"
+    entry_price: 30.36
+    stop_loss_pct: -15
+    take_profit_pct: 35
+    intraday_threshold_pct: 4.0

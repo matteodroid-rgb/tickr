@@ -1,0 +1,4 @@
+yfinance>=0.2.40
+pyyaml>=6.0
+supabase>=2.7
+requests>=2.31
